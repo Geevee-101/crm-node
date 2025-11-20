@@ -14,7 +14,7 @@ const clients = [
     status: "Active",
     contact: "test01@nerv.com",
     organization: "Nerv",
-    assignedTo: "Worker01",
+    assignedTo: "User 1",
     createdAt: "2025-11-19T00:00:00.000Z",
   },
   {
@@ -24,7 +24,7 @@ const clients = [
     status: "Inactive",
     contact: "test02@nerv.com",
     organization: "Nerv",
-    assignedTo: "Worker02",
+    assignedTo: "User 2",
     createdAt: "2025-11-19T00:00:00.000Z",
   },
   {
@@ -34,7 +34,7 @@ const clients = [
     status: "Inactive",
     contact: "test03@nerv.com",
     organization: "Nerv",
-    assignedTo: "Worker03",
+    assignedTo: "User 3",
     createdAt: "2025-11-19T00:00:00.000Z",
   },
 ]

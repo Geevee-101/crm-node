@@ -8,11 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Pencil } from "lucide-react";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 function EditStatusButton () {
-  function handleStatusChange(status: string) {
-    console.log("Changing status to:", status);
-  }
+  const handleStatusChange = (status: string) => {
+    toast.success("Status updated successfully!");
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
