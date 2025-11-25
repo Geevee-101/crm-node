@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: crm-node-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: crm-node-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
