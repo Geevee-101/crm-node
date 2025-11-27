@@ -5,9 +5,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import EditStatusButton from "./edit-status-button";
+import type { Client } from "@/lib/api/clients";
+import type { User } from "@/lib/api/users";
+import { formatDate } from "@/lib/utils";
 
-
-function ClientDetailsTable ({ client }: { client: any }) {
+function ClientDetailsTable ({ client, users }: { client: Client, users: User[] }) {
   return (
     <>
       {client ? 
@@ -30,8 +32,8 @@ function ClientDetailsTable ({ client }: { client: any }) {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="table-cell-header-col">Contact</TableCell>
-                  <TableCell>{client.contact}</TableCell>
+                  <TableCell className="table-cell-header-col">Email</TableCell>
+                  <TableCell>{client.email}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="table-cell-header-col">Organization</TableCell>
@@ -39,11 +41,13 @@ function ClientDetailsTable ({ client }: { client: any }) {
                 </TableRow>
                 <TableRow>
                   <TableCell className="table-cell-header-col">Assigned To</TableCell>
-                  <TableCell>{client.assignedTo}</TableCell>
+                  <TableCell>
+                    {users.find(user => user.id === client.assignedToId)?.name || 'Unassigned'}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="table-cell-header-col">Created At</TableCell>
-                  <TableCell>{client.createdAt}</TableCell>
+                  <TableCell>{formatDate(client.createdAt)}</TableCell>
                 </TableRow>
             </TableBody>
           </Table>

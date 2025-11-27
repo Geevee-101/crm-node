@@ -6,18 +6,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import type { Client } from "@/lib/api/clients"
+import { formatDate } from "@/lib/utils"
 
-export type clientsType = {
-  id: number;
-  name: string;
-  status: string;
-  createdAt: string;
-}
-
-export const columns: ColumnDef<clientsType>[] = [
+export const columns: ColumnDef<Client>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -29,6 +23,10 @@ export const columns: ColumnDef<clientsType>[] = [
   {
     accessorKey: "createdAt",
     header: "Created At",
+    cell: ({ row }) => {
+      const formattedDate = formatDate(row.getValue("createdAt"))
+      return <div>{formattedDate}</div>
+    },
   },
   {
     id: "actions",

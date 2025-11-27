@@ -41,7 +41,7 @@ async function main() {
     create: {
       name: 'Motoko',
       avatar: '',
-      status: 'active',
+      status: 'Active',
       email: 'motoko@section9.com',
       organization: 'Section 9',
       assignedToId: 1,
