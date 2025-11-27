@@ -33,4 +33,24 @@ export const getClientDetail = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch client" });
   }
 };
-  
+
+export const createClient = async (req: Request, res: Response) => {
+  try {
+    const { name, avatar, status, email, organization, assignedToId } = req.body;
+    console.log("Creating client with data:", { name, avatar, status, email, organization, assignedToId });
+    await prisma.client.create({
+      data: {
+        name,
+        avatar,
+        status,
+        email,
+        organization,
+        assignedToId
+      }
+    });
+    res.status(201).json({ message: "Client created successfully" });
+  } catch (error) {
+    console.error("Create client failed:", error);
+    res.status(500).json({ message: "Failed to create client" });
+  }
+};

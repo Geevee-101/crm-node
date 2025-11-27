@@ -7,6 +7,7 @@ import cors from "cors";
 
 const app = express();
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(express.json());
 
 const PORT = ENV.PORT || 3000;
 
