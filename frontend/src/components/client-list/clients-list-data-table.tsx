@@ -22,6 +22,7 @@ interface DataTableProps<TData extends { id: number }, TValue> {
   data: TData[]
   columnFilters?: ColumnFiltersState
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
+  setClients: (clients: TData[]) => void
 }
 
 export function ClientsListDataTable<TData extends { id: number }, TValue>({
@@ -29,7 +30,8 @@ export function ClientsListDataTable<TData extends { id: number }, TValue>({
   data,
   columnFilters,
   onColumnFiltersChange,
-}: DataTableProps<TData, TValue>) {
+  setClients,
+}: DataTableProps<TData, TValue> & { setClients: (clients: TData[]) => void }) {
   const table = useReactTable({
     data,
     columns,
@@ -48,7 +50,7 @@ export function ClientsListDataTable<TData extends { id: number }, TValue>({
   return (
     <div>
       <div className="flex justify-between">
-        <AddClientButton />
+        <AddClientButton setClients={setClients} />
         <div className="flex gap-2 items-center">
           <h3 className="text-sm font-semibold">Filters:</h3>
           <StatusFilterDropdown />

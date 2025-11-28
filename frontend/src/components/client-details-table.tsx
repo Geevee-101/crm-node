@@ -9,7 +9,7 @@ import type { Client } from "@/lib/api/clients";
 import type { User } from "@/lib/api/users";
 import { formatDate } from "@/lib/utils";
 
-function ClientDetailsTable ({ client, users }: { client: Client, users: User[] }) {
+function ClientDetailsTable ({ client, users }: { client: Client, users: User[]}) {
   return (
     <>
       {client ? 
@@ -28,7 +28,7 @@ function ClientDetailsTable ({ client, users }: { client: Client, users: User[] 
                   <TableCell className="table-cell-header-col">Status</TableCell>
                   <TableCell className="flex items-center gap-2">
                     {client.status}
-                    <EditStatusButton />
+                    <EditStatusButton clientId={client.id} />
                   </TableCell>
                 </TableRow>
                 <TableRow>

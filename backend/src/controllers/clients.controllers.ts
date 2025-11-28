@@ -54,3 +54,25 @@ export const createClient = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to create client" });
   }
 };
+
+export const updateClientStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!id || !status) {
+      return res.status(400).json({ message: "Client ID and status are required" });
+    }
+    
+    await prisma.client.update({
+      where: { id: parseInt(id) },
+      data: { status }
+    });
+    
+    res.json({ message: "Client status updated successfully" });
+  } catch (error) {
+    console.error("Update client status failed:", error);
+    res.status(500).json({ message: "Failed to update client status" });
+  }
+};
+  

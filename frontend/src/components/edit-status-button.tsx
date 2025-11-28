@@ -9,10 +9,23 @@ import {
 import { Pencil } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { clientsApi } from "@/lib/api/clients";
+import { useContext } from "react";
+import { ClientContext } from "@/pages/ClientDetails";
 
-function EditStatusButton () {
-  const handleStatusChange = (status: string) => {
-    toast.success("Status updated successfully!");
+function EditStatusButton ({ clientId }: { clientId: number }) {
+  const { getClientDetails } = useContext(ClientContext);
+
+  const handleStatusChange = async (status: string) => {
+    try {
+      await clientsApi.updateStatus(clientId, status);
+      // Update the client state with the new status
+      getClientDetails();
+      toast.success("Status updated successfully!");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast.error("Failed to update status");
+    }
   };
   
   return (

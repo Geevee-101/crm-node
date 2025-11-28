@@ -13,7 +13,6 @@ function ClientList () {
   const [isLoading, setIsLoading] = useState(false)
 
   const getAllClients = async () => {
-    setIsLoading(true);
     try {
       const data = await clientsApi.getAll();
       setClients(data);
@@ -23,14 +22,14 @@ function ClientList () {
       } else {
         toast.error('Failed to fetch clients');
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     getAllClients();
-  }, []);
+    setIsLoading(false);
+  }, [clients]);
 
   return (
     <div className="flex flex-col p-8 gap-4">
@@ -44,6 +43,7 @@ function ClientList () {
           data={clients}
           columnFilters={columnFilters}
           onColumnFiltersChange={setColumnFilters}
+          setClients={setClients}
         />
       )}
     </div>

@@ -27,6 +27,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useEffect, useState } from "react"
+import type { User } from "@/lib/api/users"
+import { usersApi } from "@/lib/api/users"
+import { AxiosError } from "axios"
+import { clientsApi } from "@/lib/api/clients"
+
 
 const formSchema = z.object({
   name: z
@@ -36,54 +42,87 @@ const formSchema = z.object({
   avatar: z
     .string(),
   status: z
-    .enum(["Active", "Inactive"], "Please select a status."),
-  contact: z
     .string()
-    .min(2, "Contact must be at least 2 characters.")
-    .max(16, "Contact must be at most 16 characters."),
+    .min(1, "Status is required.")
+    .refine((value) => value === "Active" || value === "Inactive", {
+      message: "Status must be either Active or Inactive",
+    }),
+  email: z
+    .email({ message: "Please enter a valid email address." }),
   organization: z
     .string()
     .min(2, "Organization must be at least 2 characters.")
     .max(64, "Organization must be at most 64 characters."),
-  assignedTo: z
+  assignedToId: z
     .string()
     .min(1, "Please assign a user.")
 })
 
-const users = [
-  {
-    id: 1,
-    name: "User 1",
-  },
-  {
-    id: 2,
-    name: "User 2",
-  },
-  {
-    id: 3,
-    name: "User 3",
-  },
-]
+export function AddClientButton({ setClients }: { setClients: (clients: any[]) => void }) {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-export function AddClientButton() {
+  const getAllUsers = async () => {
+    try {
+      const data = await usersApi.getAll();
+      setUsers(data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || error.message);
+      } else {
+        toast.error('Failed to fetch users');
+      }
+    }
+  }
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       avatar: "",
-      status: "Active",
-      contact: "",
+      status: "",
+      email: "",
       organization: "",
-      assignedTo: "",
+      assignedToId: "",
     },
   });
 
+  const createClient = async (data: z.infer<typeof formSchema>) => {
+    const payload = {
+      ...data,
+      assignedToId: parseInt(data.assignedToId, 10),
+    };
+    setIsSubmitting(true);
+    try {
+      await clientsApi.create(payload);
+      // Refresh the client list after adding a new client
+      const newClients = await clientsApi.getAll();
+      setClients(newClients);
+    } catch (error) {
+      console.error("Failed to create client:", error);
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || error.message);
+      } else {
+        toast.error('Failed to add client');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   function onSubmit(data: z.infer<typeof formSchema>) {
+    createClient(data);
     toast.success("Client added successfully!");
+    form.reset();
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>Add Client</Button>
       </DialogTrigger>
@@ -165,16 +204,17 @@ export function AddClientButton() {
               )}
             />
             <Controller
-              name="contact"
+              name="email"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="add-client-form-input-contact" className="sr-only">
-                    Contact
+                  <FieldLabel htmlFor="add-client-form-input-email" className="sr-only">
+                    Email
                   </FieldLabel>
                   <Input
-                    id="add-client-form-input-contact"
-                    placeholder="Enter client contact"
+                    id="add-client-form-input-email"
+                    type="email"
+                    placeholder="Enter client email"
                     {...field}
                   />
                   {fieldState.invalid && (
@@ -203,11 +243,11 @@ export function AddClientButton() {
               )}
             />
             <Controller
-              name="assignedTo"
+              name="assignedToId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="add-client-form-select-assignedTo" className="sr-only">
+                  <FieldLabel htmlFor="add-client-form-select-assignedToId" className="sr-only">
                     Assigned To
                   </FieldLabel>
                   <Select
@@ -216,7 +256,7 @@ export function AddClientButton() {
                     onValueChange={field.onChange}
                     >
                     <SelectTrigger
-                      id="add-client-form-select-assignedTo"
+                      id="add-client-form-select-assignedToId"
                       aria-invalid={fieldState.invalid}
                       >
                       <SelectValue placeholder="Select a user" />
@@ -238,8 +278,11 @@ export function AddClientButton() {
           </FieldGroup>
         </form>
         <DialogFooter className="sm:justify-start">
-          <Button form="add-client-form" type="submit" className="hover:cursor-pointer">
-            Submit
+          <Button form="add-client-form" type="submit" className="hover:cursor-pointer" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </Button>
+          <Button variant="outline" onClick={() => setIsOpen(false)} className="hover:cursor-pointer">
+            Close
           </Button>
         </DialogFooter>
       </DialogContent>

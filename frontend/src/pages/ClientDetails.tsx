@@ -1,12 +1,17 @@
 import BackButton from "@/components/back-button";
 import ClientDetailsTable from "@/components/client-details-table";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { clientsApi, type Client } from "@/lib/api/clients";
 import { usersApi, type User } from "@/lib/api/users";
 import { AxiosError } from "axios";
 import { toast } from "sonner"
 
+export const ClientContext = createContext<{
+  getClientDetails: () => void;
+}>({
+  getClientDetails: () => {}
+});
 
 function ClientDetails () {
   const { id } = useParams();
@@ -14,7 +19,7 @@ function ClientDetails () {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false)
 
-  const getClientDetails = async () => {
+  const getClientDetails = useCallback(async () => {
     if (!id) {
       setIsLoading(false);
       return;
@@ -32,10 +37,9 @@ function ClientDetails () {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
 
   const getAllUsers = async () => {
-    setIsLoading(true);
     try {
       const data = await usersApi.getAll();
       setUsers(data);
@@ -45,10 +49,13 @@ function ClientDetails () {
       } else {
         toast.error('Failed to fetch users');
       }
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  const contextValue = useMemo(
+    () => ({ getClientDetails }),
+    [getClientDetails]
+  );
 
   useEffect(() => {
     getClientDetails();
@@ -64,7 +71,9 @@ function ClientDetails () {
       {isLoading ? (
         <div className="text-center py-8">Loading...</div>
       ) : client ? (
-        <ClientDetailsTable client={client} users={users} />
+        <ClientContext.Provider value={contextValue}>
+          <ClientDetailsTable client={client} users={users}/>
+        </ClientContext.Provider>
       ) : (
         <div className="text-center py-8">Client not found</div>
       )}

@@ -20,5 +20,15 @@ export const clientsApi = {
   getById: async (id: number): Promise<Client> => {
     const { data } = await axiosInstance.get<Client>(`/clients/${id}`);
     return data;
+  },
+
+  create: async (client: Omit<Client, 'id' | 'createdAt'>): Promise<Client> => {
+    const { data } = await axiosInstance.post<Client>('/clients/create', client);
+    return data;
+  },
+
+  updateStatus: async (id: number, status: string): Promise<Client> => {
+    const { data } = await axiosInstance.put<Client>(`/clients/${id}/status`, { status });
+    return data;
   }
 };
