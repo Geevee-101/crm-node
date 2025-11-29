@@ -5,16 +5,43 @@ import type { ColumnFiltersState } from "@tanstack/react-table";
 import { clientsApi, type Client } from "@/lib/api/clients";
 import { AxiosError } from "axios";
 import { toast } from "sonner"
+import { useSearchParams } from "react-router-dom"
 
 
 function ClientList () {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [clients, setClients] = useState<Client[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const getAllClients = async () => {
+  // Get status from URL, default to 'All'
+  const statusFilter = searchParams.get('status') || 'All';
+  const dateFilter = searchParams.get('date') || '';
+  
+  // Function to update status in URL
+  const setStatusFilter = (status: string) => {
+    if (status === 'All') {
+      searchParams.delete('status');
+    } else {
+      searchParams.set('status', status);
+    }
+    setSearchParams(searchParams);
+  };
+  
+  // Function to update date in URL
+  const setDateFilter = (date: string) => {
+    if (date) {
+      searchParams.set('date', date);
+    } else {
+      searchParams.delete('date');
+    }
+    setSearchParams(searchParams);
+  };
+
+  const getAllClients = async (status?: string, date?: string) => {
+    setIsLoading(true);
     try {
-      const data = await clientsApi.getAll();
+      const data = await clientsApi.getAll(status, date);
       setClients(data);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -22,14 +49,17 @@ function ClientList () {
       } else {
         toast.error('Failed to fetch clients');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    getAllClients();
-    setIsLoading(false);
-  }, [clients]);
+    getAllClients(
+      statusFilter === 'All' ? undefined : statusFilter,
+      dateFilter || undefined
+    );
+  }, [statusFilter, dateFilter]);
 
   return (
     <div className="flex flex-col p-8 gap-4">
@@ -44,6 +74,10 @@ function ClientList () {
           columnFilters={columnFilters}
           onColumnFiltersChange={setColumnFilters}
           setClients={setClients}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          dateFilter={dateFilter}
+          setDateFilter={setDateFilter}
         />
       )}
     </div>

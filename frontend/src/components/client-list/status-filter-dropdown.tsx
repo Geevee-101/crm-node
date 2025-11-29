@@ -6,22 +6,27 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 
-function StatusFilterDropdown() {
+interface StatusFilterDropdownProps {
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+}
+
+function StatusFilterDropdown({ statusFilter, setStatusFilter }: StatusFilterDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          Status: All
+          Status: {statusFilter}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => null}>
+        <DropdownMenuItem onClick={() => setStatusFilter("All")}>
           All
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => null}>
+        <DropdownMenuItem onClick={() => setStatusFilter("Active")}>
           Active
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => null}>
+        <DropdownMenuItem onClick={() => setStatusFilter("Inactive")}>
           Inactive
         </DropdownMenuItem>
       </DropdownMenuContent>

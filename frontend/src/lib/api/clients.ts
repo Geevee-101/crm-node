@@ -12,8 +12,15 @@ export interface Client {
 }
 
 export const clientsApi = {
-  getAll: async (): Promise<Client[]> => {
-    const { data } = await axiosInstance.get<Client[]>('/clients/list');
+  getAll: async (status?: string, date?: string): Promise<Client[]> => {
+    const params: any = {};
+    if (status && status !== 'All') {
+      params.status = status;
+    }
+    if (date) {
+      params.date = date;
+    }
+    const { data } = await axiosInstance.get<Client[]>('/clients/list', { params });
     return data;
   },
 

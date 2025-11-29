@@ -23,6 +23,10 @@ interface DataTableProps<TData extends { id: number }, TValue> {
   columnFilters?: ColumnFiltersState
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
   setClients: (clients: TData[]) => void
+  statusFilter: string
+  setStatusFilter: (status: string) => void
+  dateFilter: string
+  setDateFilter: (date: string) => void
 }
 
 export function ClientsListDataTable<TData extends { id: number }, TValue>({
@@ -31,7 +35,11 @@ export function ClientsListDataTable<TData extends { id: number }, TValue>({
   columnFilters,
   onColumnFiltersChange,
   setClients,
-}: DataTableProps<TData, TValue> & { setClients: (clients: TData[]) => void }) {
+  statusFilter,
+  setStatusFilter,
+  dateFilter,
+  setDateFilter,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -53,8 +61,8 @@ export function ClientsListDataTable<TData extends { id: number }, TValue>({
         <AddClientButton setClients={setClients} />
         <div className="flex gap-2 items-center">
           <h3 className="text-sm font-semibold">Filters:</h3>
-          <StatusFilterDropdown />
-          <DateFilterInput />
+          <StatusFilterDropdown statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
+          <DateFilterInput dateFilter={dateFilter} setDateFilter={setDateFilter} />
         </div>
       </div>
       <div className="border border-gray-400 rounded-md overflow-hidden mt-2">
